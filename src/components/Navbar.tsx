@@ -102,8 +102,8 @@ const Navbar = () => {
     //   console.log(err);
     // }
   };
-  // useEffect(() => {}, []);
-  useEffect(() => {}, [isWeb3Enabled]);
+  // // useEffect(() => {}, []);
+  // useEffect(() => {}, [isWeb3Enabled]);
 
   useEffect(() => {
     if (isWeb3Enabled) return;

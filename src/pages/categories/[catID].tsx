@@ -8,12 +8,11 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import { useRouter } from "next/router";
 
 export default function news({ posts }) {
-  const router = useRouter();
-  const { catID } = router.query;
+  // const router = useRouter();
+  const { catID } = useRouter().query;
   const filteredPost = posts.filter((post) => {
     return (
       post.location.toLowerCase() === catID ||

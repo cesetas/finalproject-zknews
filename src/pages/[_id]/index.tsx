@@ -60,10 +60,9 @@ export default function Post({ post }) {
 
     const { zkNewsContract, account } = await getContract();
 
-    let options = { from: account, gas: 6721900 };
     const transactionResponse = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call(options);
+      .call({ from: account, gas: 6721900 });
 
     identityCommitments = transactionResponse;
 
@@ -173,10 +172,9 @@ export default function Post({ post }) {
 
     const { zkNewsContract, account } = await getContract();
 
-    let options = { from: account, gas: 6721900 };
     const transactionResponse = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call(options);
+      .call({ from: account, gas: 6721900 });
 
     identityCommitments = transactionResponse;
 

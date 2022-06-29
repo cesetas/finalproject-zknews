@@ -67,10 +67,9 @@ function PostNews() {
     try {
       const { zkNewsContract, account } = await getContract();
 
-      let options = { from: account, gas: 6721900 };
       const transactionResponse = await zkNewsContract.methods
         .getIdentityCommitments()
-        .call(options);
+        .call({ from: account, gas: 6721900 });
 
       currentIdentityCommitments = transactionResponse;
     } catch (error: any) {
@@ -106,11 +105,9 @@ function PostNews() {
 
       const { zkNewsContract, account } = await getContract();
 
-      let options = { from: account, gas: 6721900 };
-
       await zkNewsContract.methods
         .postNews(utils.formatBytes32String(postId), hashCommitment)
-        .send(options);
+        .send({ from: account, gas: 6721900 });
 
       console.log("14");
       setIsStatusChanged(true);

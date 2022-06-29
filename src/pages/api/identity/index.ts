@@ -8,11 +8,10 @@ export default async function handler(
   try {
     const { zkNewsContract, account } = await getContract();
 
-    let options = { from: account, gas: 6721900 };
-    let identityCommitments: any = [];
+    // const identityCommitments: any = [];
     const identityCommitmentsBN = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call(options);
+      .call({ from: account, gas: 6721900 });
 
     // for (var i = 0; i < identityCommitmentsBN.length; i++) {
     //   identityCommitments.push(identityCommitmentsBN[i].toString());

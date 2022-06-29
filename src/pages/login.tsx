@@ -15,10 +15,10 @@ import Link from "next/link";
 import { getContract } from "../utils/contract";
 
 const login = () => {
-  const [isLoging, setIsLoging] = useState(false);
-  const [status, setStatus] = useState("");
-  const [isStatusChanged, setIsStatusChanged] = useState(false);
-  const [identityStatus, setIdentityStatus] = useState(false);
+  const [isLoging, setIsLoging] = React.useState(false);
+  const [status, setStatus] = React.useState("");
+  const [isStatusChanged, setIsStatusChanged] = React.useState(false);
+  const [identityStatus, setIdentityStatus] = React.useState(false);
 
   const handleLogin = async () => {
     setIsLoging(true);
@@ -44,10 +44,9 @@ const login = () => {
 
     const { zkNewsContract, account } = await getContract();
 
-    let options = { from: account, gas: 6721900 };
     const transactionResponse = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call(options);
+      .call({ from: account, gas: 6721900 });
 
     identityCommitments = transactionResponse;
 
