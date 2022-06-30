@@ -2,7 +2,7 @@ import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 // import "dotenv/config";
 // import { contractAddresses, config } from "../constants";
-import abi from "../../../contracts/artifacts/contracts/zkNews.sol/zkNews.json";
+import abi from "../../contracts/artifacts/contracts/zkNews.sol/zkNews.json";
 
 const getContract = async () => {
   const PTE_KEY = process.env.LOC_PRIVATE_KEY;
