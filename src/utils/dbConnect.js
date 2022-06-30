@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-// import dotenv from "dotenv";
+import dotenv from "dotenv";
 
 const connection = {};
 
-// dotenv.config();
+dotenv.config();
 
 async function dbConnect() {
   if (connection.isConnected) {

@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import MainBody from "../components/MainBody";
 
-const Home: NextPage = ({ posts }) => {
+const Home: NextPage = (posts) => {
   console.log(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   return (
     <>

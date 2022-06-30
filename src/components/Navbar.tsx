@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { MenuIcon } from "@heroicons/react/outline";
+// import { MenuIcon } from "@heroicons/react/outline";
 import { useMoralis } from "react-moralis";
 import { ConnectButton } from "web3uikit";
 import Link from "next/link";
@@ -36,10 +36,10 @@ const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
+  // const handleOpenNavMenu = (event: any) => {
+  //   setAnchorElNav(event.currentTarget);
+  // };
+  const handleOpenUserMenu = (event: any) => {
     setAnchorElUser(event.currentTarget);
   };
 
@@ -82,26 +82,26 @@ const Navbar = () => {
     deactivateWeb3,
   } = useMoralis();
 
-  const connectWallet = async () => {
-    if (!window.ethereum) {
-      alert("Install metamask!");
-      return;
-    }
+  // const connectWallet = async () => {
+  //   if (!window.ethereum) {
+  //     alert("Install metamask!");
+  //     return;
+  //   }
 
-    await enableWeb3();
-    console.log(account);
-    setMyAccount(account);
+  //   await enableWeb3();
+  //   console.log(account);
+  //   setMyAccount(account);
 
-    // try {
-    //   const accounts = await ethereum.request({
-    //     method: "eth_requestAccounts",
-    //   });
-    //   console.log("account[0]: ", accounts[0]);
-    //   setAccount(accounts[0]);
-    // } catch (err) {
-    //   console.log(err);
-    // }
-  };
+  //   // try {
+  //   //   const accounts = await ethereum.request({
+  //   //     method: "eth_requestAccounts",
+  //   //   });
+  //   //   console.log("account[0]: ", accounts[0]);
+  //   //   setAccount(accounts[0]);
+  //   // } catch (err) {
+  //   //   console.log(err);
+  //   // }
+  // };
   // // useEffect(() => {}, []);
   // useEffect(() => {}, [isWeb3Enabled]);
 
@@ -132,7 +132,7 @@ const Navbar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -143,7 +143,7 @@ const Navbar = () => {
   const [anchorEl2, setAnchorEl2] = React.useState(null);
   const open2 = Boolean(anchorEl2);
 
-  const handleClick2 = (event) => {
+  const handleClick2 = (event: any) => {
     setAnchorEl2(event.currentTarget);
   };
 
@@ -178,7 +178,7 @@ const Navbar = () => {
             </Link>
 
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
+              {/* <IconButton
                 size="large"
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
@@ -187,7 +187,7 @@ const Navbar = () => {
                 color="inherit"
               >
                 <MenuIcon />
-              </IconButton>
+              </IconButton> */}
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElNav}

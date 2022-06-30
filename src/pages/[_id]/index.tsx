@@ -33,7 +33,7 @@ export default function Post({ post }) {
   const [salt, setSalt] = useState("");
 
   const router = useRouter();
-  const postId = router.query._id;
+  const postId = router.query._id as any;
 
   const likePost = async () => {
     setIsLiking(true);
@@ -127,7 +127,7 @@ export default function Post({ post }) {
       }
 
       try {
-        const liked = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+        await fetch(`http://localhost:3000/api/posts/${postId}`, {
           method: "PUT",
           headers: {
             Accept: "application/json",
@@ -239,17 +239,14 @@ export default function Post({ post }) {
       }
 
       try {
-        const disliked = await fetch(
-          `http://localhost:3000/api/posts/${postId}`,
-          {
-            method: "PUT",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ likes: post.dislikes++ }),
-          }
-        );
+        await fetch(`http://localhost:3000/api/posts/${postId}`, {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ likes: post.dislikes++ }),
+        });
       } catch (error) {
         setIsDisliking(false);
         console.log(error);
@@ -323,6 +320,7 @@ export default function Post({ post }) {
     const identityCommitment = identity.genIdentityCommitment();
 
     const privateSalt = salt;
+    // const poseidon = buildPoseidon();
 
     const hashCommitment = poseidon([privateSalt, identityCommitment]);
 
@@ -360,7 +358,7 @@ export default function Post({ post }) {
   const deletePost = async () => {
     const postId = router.query._id;
     try {
-      const deleted = await fetch(`http://localhost:3000/api/posts/${postId}`, {
+      await fetch(`http://localhost:3000/api/posts/${postId}`, {
         method: "Delete",
       });
 
@@ -370,25 +368,25 @@ export default function Post({ post }) {
     }
   };
 
-  const handleLike = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLike = async (event: any) => {
     event.preventDefault();
     setIsLiking(true);
     likePost();
   };
 
-  const handleDislike = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleDislike = async (event: any) => {
     event.preventDefault();
     setIsDisliking(true);
     dislikePost();
   };
 
-  const handleFund = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleFund = async (event: any) => {
     event.preventDefault();
     setIsFunding(true);
     fundPost();
   };
 
-  const handleWithdraw = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleWithdraw = async (event: any) => {
     event.preventDefault();
     setIsWithdrawing(true);
     withdraw();
@@ -434,20 +432,21 @@ export default function Post({ post }) {
                 {post.news}
               </h2>
 
-              <Button onClick={handleLike} size="small">
-                {isLiking ? (
-                  <CircularProgress />
-                ) : (
+              {isLiking ? (
+                <CircularProgress />
+              ) : (
+                <Button onClick={handleLike} size="small">
                   <span>Like {post.likes}</span>
-                )}
-              </Button>
-              <Button onClick={handleDislike} size="small" color="warning">
-                {isDisliking ? (
-                  <CircularProgress />
-                ) : (
-                  <span>Dislike {post.dislikes}</span>
-                )}
-              </Button>
+                </Button>
+              )}
+
+              {isDisliking ? (
+                <CircularProgress />
+              ) : (
+                <Button onClick={handleDislike} size="small" color="warning">
+                  Dislike {post.dislikes}
+                </Button>
+              )}
 
               <Button onClick={handleDelete} size="small">
                 delete

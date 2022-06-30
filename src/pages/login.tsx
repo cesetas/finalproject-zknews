@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { getContract } from "../utils/contract";
 
-const login = () => {
+const Login = () => {
   const [isLoging, setIsLoging] = React.useState(false);
   const [status, setStatus] = React.useState("");
   const [isStatusChanged, setIsStatusChanged] = React.useState(false);
@@ -170,4 +170,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;
