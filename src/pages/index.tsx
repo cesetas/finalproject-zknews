@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import MainBody from "../components/MainBody";
 
-const Home: NextPage = (posts) => {
+const Home: NextPage = () => {
   console.log(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   return (
     <>
@@ -30,9 +30,9 @@ export default Home;
 //   };
 // }
 
-Home.getInitialProps = async () => {
-  const res = await fetch("http://localhost:3000/api/posts");
-  const { data } = await res.json();
+// Home.getInitialProps = async () => {
+//   const res = await fetch("http://localhost:3000/api/posts");
+//   const { data } = await res.json();
 
-  return { posts: data };
-};
+//   return { posts: data };
+// };

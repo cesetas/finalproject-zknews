@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   eslint: { ignoreDuringBuilds: true },
+  webpack5: true,
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     if (!isServer) {
       config.plugins.push(
@@ -12,14 +13,8 @@ const nextConfig = {
 
       config.resolve.fallback = {
         fs: false,
-        tls: false,
-        net: false,
-        zlib: false,
         stream: false,
-        http: false,
-        https: false,
         crypto: false,
-        url: false,
         os: false,
         readline: false,
         ejs: false,
@@ -30,8 +25,41 @@ const nextConfig = {
       return config;
     }
 
+    config.experiments = {
+      asyncWebAssembly: true,
+      syncWebAssembly: true,
+      layers: true,
+    };
+
     return config;
   },
 };
 
 module.exports = nextConfig;
+
+// webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+//   if (!isServer) {
+//     config.plugins.push(
+//       new webpack.ProvidePlugin({
+//         global: "global",
+//       })
+//     );
+
+//     config.resolve.fallback = {
+//       fs: false,
+//       stream: false,
+//       crypto: false,
+//       os: false,
+//       readline: false,
+//       ejs: false,
+//       assert: require.resolve("assert"),
+//       path: false,
+//     };
+//     config.experiments = { asyncWebAssembly: true };
+
+//     return config;
+//   }
+
+//   return config;
+// },
+// };

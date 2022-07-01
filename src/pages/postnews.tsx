@@ -19,7 +19,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import fetch from "isomorphic-unfetch";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { poseidon } from "circomlibjs";
+import { buildMimc7 } from "circomlibjs";
 
 const theme = createTheme();
 
@@ -40,6 +40,32 @@ function PostNews() {
   const [status, setStatus] = useState("");
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [identityStatus, setIdentityStatus] = useState(false);
+
+  type TypedArray =
+    | Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array
+    | BigInt64Array
+    | BigUint64Array;
+
+  const buf2Bigint = (buf: ArrayBuffer | TypedArray | Buffer): bigint => {
+    let bits = 8n;
+    if (ArrayBuffer.isView(buf)) bits = BigInt(buf.BYTES_PER_ELEMENT * 8);
+    else buf = new Uint8Array(buf);
+
+    let ret = 0n;
+    for (const i of (buf as TypedArray | Buffer).values()) {
+      const bi = BigInt(i);
+      ret = (ret << bits) + bi;
+    }
+    return ret;
+  };
 
   const createPost = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -101,7 +127,13 @@ function PostNews() {
 
       const privateSalt = commitment;
 
-      const hashCommitment = poseidon([privateSalt, identityCommitment]);
+      const mimc7 = (await buildMimc7()) as any;
+
+      const hashCommitment = buf2Bigint(
+        mimc7.hash(privateSalt, identityCommitment)
+      );
+
+      console.log("hash commitment :" + hashCommitment);
 
       const { zkNewsContract, account } = await getContract();
 

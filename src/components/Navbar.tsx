@@ -343,13 +343,9 @@ const Navbar = () => {
                 ))}
               </Menu>
 
-              {account ? (
-                <Button color="inherit">WElCOME</Button>
-              ) : (
-                <Link href="/login">
-                  <Button color="inherit">Registration</Button>
-                </Link>
-              )}
+              <Link href="/login">
+                <Button color="inherit">Registration</Button>
+              </Link>
 
               {/* {account ? (
                 <Button color="inherit">

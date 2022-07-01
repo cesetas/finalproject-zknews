@@ -31,13 +31,13 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
 
     mapping(bytes32 => Post) public posts; 
 
-
-    event Registration(bytes32 signal);
+    // event Registration(bytes32 signal);
     event NewPost(bytes32 postId);
     event PostLiked(bytes32 postId, uint256 likes);
     event PostDisliked(bytes32 postId, uint256 dislikes);
     event IdentityCommitment(uint256 indexed identityCommitment);
     event Withdrawal(bytes32 postId, uint256 balance);
+    event Funded(bytes32 postId);
 
 
     constructor(address _verifier) {
@@ -59,27 +59,27 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
     }
 
 
-    function register(
-        bytes32 signal,
-        uint256 root,
-        uint256 nullifierHash,
-        uint256 externalNullifier,
-        uint256[8] calldata proof
-    )
-        external 
-    {
-        _verifyProof(
-                signal,
-                root,
-                nullifierHash,
-                externalNullifier,
-                proof,
-                verifier
-            );
+    // function register(
+    //     bytes32 signal,
+    //     uint256 root,
+    //     uint256 nullifierHash,
+    //     uint256 externalNullifier,
+    //     uint256[8] calldata proof
+    // )
+    //     external 
+    // {
+    //     _verifyProof(
+    //             signal,
+    //             root,
+    //             nullifierHash,
+    //             externalNullifier,
+    //             proof,
+    //             verifier
+    //         );
 
-        _saveNullifierHash(nullifierHash);
-        emit Registration(signal);
-    }
+    //     _saveNullifierHash(nullifierHash);
+    //     emit Registration(signal);
+    // }
 
     function postNews(
         bytes32 postId,
@@ -167,5 +167,6 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
 
     function  fundPost( bytes32 postId ) payable public {
         posts[postId].balance += msg.value;
+         emit Funded(postId);
     }
 }

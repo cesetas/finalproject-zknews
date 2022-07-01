@@ -1,13 +1,13 @@
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 // import "dotenv/config";
-// import { contractAddresses, config } from "../constants";
-import abi from "../../contracts/artifacts/contracts/zkNews.sol/zkNews.json";
+import { contractAddresses, configuration } from "./constants";
+import abi from "../../artifacts/contracts/zkNews.sol/zkNews.json";
 
 const getContract = async () => {
-  const PTE_KEY = process.env.LOC_PRIVATE_KEY;
-  const URL = process.env.LOC_URL;
-  const contractAddress = process.env.CONTRACT_ADDRESS;
+  const PTE_KEY = configuration.DEV_PRIVATE_KEY;
+  const URL = configuration.DEV_URL;
+  const contractAddress = contractAddresses.devnet;
 
   const web3 = new Web3(URL as string);
   web3.eth.handleRevert = true; // return custom error messages from contract

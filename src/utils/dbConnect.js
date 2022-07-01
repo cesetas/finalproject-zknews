@@ -14,19 +14,19 @@ async function dbConnect() {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  console.log("mongose connection url :" + process.env.CONNECTION_URL);
+
   connection.isConnected = db.connections[0].readyState;
   console.log(connection.isConnected);
 }
 
 export default dbConnect;
 
-export async function getServerSideProps() {
-  console.log(process.env.CONNECTION_URL);
+// export async function getServerSideProps() {
+//   console.log(process.env.CONNECTION_URL);
 
-  return {
-    props: {
-      hello: "world",
-    },
-  };
-}
+//   return {
+//     props: {
+//       hello: "world",
+//     },
+//   };
+// }
