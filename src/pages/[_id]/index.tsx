@@ -34,7 +34,8 @@ export default function Post({ post }) {
   const [salt, setSalt] = useState("");
 
   const router = useRouter();
-  const postId = router.query._id as any;
+  // const postId = router.query._id as any;
+  const postId = post._id as any;
   console.log(postId);
 
   type TypedArray =
@@ -389,7 +390,7 @@ export default function Post({ post }) {
 
   //This function is just for development. After deploymnet to mainnet it will be deleted
   const deletePost = async () => {
-    const postId = router.query._id;
+    // const postId = router.query._id;
     try {
       await fetch(`http://localhost:3000/api/posts/${postId}`, {
         method: "Delete",
@@ -430,18 +431,16 @@ export default function Post({ post }) {
     deletePost();
   };
 
-  const [loading, setLoading] = useState(true);
-  function handleClick() {
-    setLoading(true);
-  }
+  // const [loading, setLoading] = useState(true);
+  // function handleClick() {
+  //   setLoading(true);
+  // }
 
   return (
     <div>
       {isDeleting ? (
         <LoadingButton
-          onClick={handleClick}
           endIcon={<SendIcon />}
-          loading={loading}
           loadingPosition="end"
           variant="contained"
         >

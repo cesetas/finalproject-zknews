@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import dateFormat from "dateformat";
 
 export default function news({ posts }) {
   return (
@@ -35,16 +36,20 @@ export default function news({ posts }) {
                   <CardMedia
                     component="img"
                     max-height="10px"
+                    min-height="10px"
                     image={post.photoURL}
                     alt={post.location}
                   />
                   <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography gutterBottom variant="h5" component="h5">
                       {post.title}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {post.news}
+                      {post.news.slice(0, 150)}...
                     </Typography>
+                    <br />
+                    <div className="flex items-end"></div>
+                    {dateFormat(post.createdAt, "mmmm dS, yyyy")}
                   </CardContent>
                   <CardActions>
                     <Link href={`/${post._id}`}>

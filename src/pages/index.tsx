@@ -3,7 +3,6 @@ import Head from "next/head";
 import MainBody from "../components/MainBody";
 
 const Home: NextPage = () => {
-  console.log(process.env.NEXT_PUBLIC_CONTRACT_ADDRESS);
   return (
     <>
       <Head>

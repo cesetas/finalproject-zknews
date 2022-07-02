@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { configuration } from "./constants";
 
 const connection = {};
 
@@ -10,13 +11,12 @@ async function dbConnect() {
     return;
   }
 
-  const db = await mongoose.connect(process.env.CONNECTION_URL, {
+  const db = await mongoose.connect(configuration.CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
 
   connection.isConnected = db.connections[0].readyState;
-  console.log(connection.isConnected);
 }
 
 export default dbConnect;

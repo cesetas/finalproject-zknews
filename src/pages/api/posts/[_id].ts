@@ -6,14 +6,14 @@ dbConnect();
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
-    query: { id },
+    query: { _id },
     method,
   } = req;
 
   switch (method) {
     case "GET":
       try {
-        const post = await Post.findById(id);
+        const post = await Post.findById(_id);
 
         if (!post) {
           return res.status(400).json({ success: false });
@@ -26,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "PUT":
       try {
-        const post = await Post.findByIdAndUpdate(id, req.body, {
+        const post = await Post.findByIdAndUpdate(_id, req.body, {
           new: true,
           runValidators: true,
         });
@@ -42,7 +42,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       break;
     case "DELETE":
       try {
-        const deletedPost = await Post.deleteOne({ _id: id });
+        const deletedPost = await Post.deleteOne({ _id: _id });
 
         if (!deletedPost) {
           return res.status(400).json({ success: false });
