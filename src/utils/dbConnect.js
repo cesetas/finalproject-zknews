@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { configuration } from "./constants";
+// import dotenv from "dotenv";
+// import { configuration } from "./constants";
 
 const connection = {};
 
-dotenv.config();
+// dotenv.config();
 
 async function dbConnect() {
   if (connection.isConnected) {
     return;
   }
 
-  const db = await mongoose.connect(configuration.CONNECTION_URL, {
+  const db = await mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
@@ -21,12 +21,12 @@ async function dbConnect() {
 
 export default dbConnect;
 
-// export async function getServerSideProps() {
-//   console.log(process.env.CONNECTION_URL);
+export async function getServerSideProps() {
+  // console.log(process.env.CONNECTION_URL);
 
-//   return {
-//     props: {
-//       hello: "world",
-//     },
-//   };
-// }
+  return {
+    props: {
+      hello: "world",
+    },
+  };
+}
