@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 import "hardhat-gas-reporter";
 import "hardhat-dependency-compiler";
 import { HardhatUserConfig } from "hardhat/config";
-import { configuration } from "./src/utils/constants";
+// import { configuration } from "./src/utils/constants";
 import "./tasks/deploy";
 // import "./scripts/deploy";
 // import "./test/zknews-test";
@@ -21,16 +21,16 @@ const config: HardhatUserConfig = {
   // },
   networks: {
     localhost: {
-      url: configuration.LOC_URL,
-      accounts: [configuration.LOC_PRIVATE_KEY!],
+      url: process.env.NEXT_PUBLIC_LOC_URL,
+      accounts: [process.env.NEXT_PUBLIC_LOC_PRIVATE_KEY],
     },
     devnet: {
-      url: configuration.DEV_URL,
-      accounts: [configuration.DEV_PRIVATE_KEY!],
+      url: process.env.NEXT_PUBLIC_LOC_URL,
+      accounts: [process.env.NEXT_PUBLIC_LOC_PRIVATE_KEY],
     },
     mainnet: {
-      url: configuration.MAIN_URL,
-      accounts: [configuration.MAIN_PRIVATE_KEY!],
+      url: process.env.NEXT_PUBLIC_LOC_URL,
+      accounts: [process.env.NEXT_PUBLIC_LOC_PRIVATE_KEY],
     },
   },
   gasReporter: {
@@ -40,3 +40,17 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
+
+export async function getServerSideProps() {
+  const PTE_KEY = process.env.LOC_PRIVATE_KEY;
+  // const URL = process.env.LOC_URL;
+  // const contractAddress = process.env.localhost;
+  // console.log(process.env.CONTRACT_ADDRESS);
+  // const contractAddress = process.env.NEXT_PUBLIC_LOC_CONTRACT_ADDRESS;
+
+  return {
+    props: {
+      hello: "world",
+    },
+  };
+}
