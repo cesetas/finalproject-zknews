@@ -32,8 +32,9 @@
 
 const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
-  webpack5: true,
+  // webpack5: true,
   reactStrictMode: true,
+
   webpack: function (config, options) {
     if (!options.isServer) {
       config.resolve.fallback.fs = false;

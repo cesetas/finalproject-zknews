@@ -1,7 +1,8 @@
 import { useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Strategy, ZkIdentity } from "@zk-kit/identity";
-import { generateMerkleProof, Semaphore } from "@zk-kit/protocols";
+// import { generateMerkleProof, Semaphore } from "@zk-kit/protocols";
+const { generateMerkleProof, Semaphore } = require("@zk-kit/protocols");
 import { ethers, providers, utils } from "ethers";
 import { getContract } from "../../utils/contract";
 import fetch from "isomorphic-unfetch";

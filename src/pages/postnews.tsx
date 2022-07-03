@@ -150,11 +150,11 @@ function PostNews() {
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: any) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
     setIsSubmitting(true);
     createPost(event);

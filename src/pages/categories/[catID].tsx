@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 export default function news({ posts }) {
   // const router = useRouter();
   const { catID } = useRouter().query as any;
-  const filteredPost = posts.filter((post) => {
+  const filteredPost = posts.filter((post: any) => {
     return (
       post.location.toLowerCase() === catID ||
       post.category.toLowerCase() === catID
@@ -31,7 +31,7 @@ export default function news({ posts }) {
           spacing={{ xs: 1, sm: 2, md: 4 }}
           columns={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 2 }}
         >
-          {filteredPost.map((filteredPost) => {
+          {filteredPost.map((filteredPost: any) => {
             return (
               <Grid
                 item
@@ -92,5 +92,5 @@ news.getInitialProps = async () => {
   const res = await fetch("http://localhost:3000/api/posts");
   const { data } = await res.json();
 
-  return { posts: data };
+  return { posts: data as any };
 };

@@ -52,7 +52,7 @@ export default function news({ posts }) {
                     {dateFormat(post.createdAt, "mmmm dS, yyyy")}
                   </CardContent>
                   <CardActions>
-                    <Link href={`/${post._id}`}>
+                    <Link href={`/news/${post._id}`}>
                       <Button size="small">Go to the details...</Button>
                     </Link>
                   </CardActions>
