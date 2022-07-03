@@ -157,7 +157,7 @@ export default function Post({ post }) {
       }
 
       try {
-        await fetch(`http://localhost:3000/api/posts/${postId}`, {
+        await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
           method: "PUT",
           headers: {
             Accept: "application/json",
@@ -269,7 +269,7 @@ export default function Post({ post }) {
       }
 
       try {
-        await fetch(`http://localhost:3000/api/posts/${postId}`, {
+        await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
           method: "PUT",
           headers: {
             Accept: "application/json",
@@ -393,7 +393,7 @@ export default function Post({ post }) {
   const deletePost = async () => {
     // const postId = router.query._id;
     try {
-      await fetch(`http://localhost:3000/api/posts/${postId}`, {
+      await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
         method: "Delete",
       });
 
@@ -615,7 +615,7 @@ export default function Post({ post }) {
 }
 
 Post.getInitialProps = async ({ query: { _id } }) => {
-  const res = await fetch(`http://localhost:3000/api/posts/${_id}`);
+  const res = await fetch(`https://zknews.vercel.app/api/posts/${_id}`);
   const { data } = await res.json();
 
   return { post: data };
