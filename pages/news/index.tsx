@@ -20,23 +20,23 @@ export default function news({ posts }) {
         <Grid
           container
           spacing={{ xs: 1, sm: 2, md: 4 }}
-          columns={{ xs: 1, sm: 1, md: 1, lg: 2, xl: 2 }}
+          columns={{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }}
         >
           {posts.map((post, _id) => {
             return (
               <Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={_id}>
                 <Card
                   sx={{
-                    minWidth: 500,
-                    maxWidth: 800,
-                    minHeight: 300,
+                    minWidth: 300,
+                    maxWidth: 600,
+                    minHeight: 200,
                     maxHeight: 800,
                   }}
                 >
                   <CardMedia
                     component="img"
-                    max-height="10px"
-                    min-height="10px"
+                    max-height={"5"}
+                    min-height="5"
                     image={post.photoURL}
                     alt={post.location}
                   />
@@ -53,7 +53,7 @@ export default function news({ posts }) {
                   </CardContent>
                   <CardActions>
                     <Link href={`/news/${post._id}`}>
-                      <Button size="small">Go to the details...</Button>
+                      <Button size="small">Go into details...</Button>
                     </Link>
                   </CardActions>
                 </Card>
@@ -74,7 +74,7 @@ export default function news({ posts }) {
 }
 
 news.getInitialProps = async () => {
-  const res = await fetch("https://zknews.vercel.app/api/posts");
+  const res = await fetch("http://localhost:3000/api/posts");
   const { data } = await res.json();
 
   return { posts: data };

@@ -32,7 +32,9 @@ export default function StickyFooter() {
       }}
     >
       <Container maxWidth="sm">
-        {/* <Typography variant="body1">setas</Typography> */}
+        <Typography variant="body1">
+          Project for Zero-Knowledge University (zku.ONE)
+        </Typography>
         <Copyright />
       </Container>
     </Box>

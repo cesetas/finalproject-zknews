@@ -1,13 +1,11 @@
 import { useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Strategy, ZkIdentity } from "@zk-kit/identity";
-// import { generateMerkleProof, Semaphore } from "@zk-kit/protocols";
 const { generateMerkleProof, Semaphore } = require("@zk-kit/protocols");
 import { ethers, providers, utils } from "ethers";
 import { getContract } from "../../utils/contract";
 import fetch from "isomorphic-unfetch";
 import { useRouter } from "next/router";
-import LoadingButton from "@mui/lab/LoadingButton";
 import SendIcon from "@mui/icons-material/Send";
 import {
   Button,
@@ -17,14 +15,13 @@ import {
   Grid,
   CircularProgress,
   Alert,
+  Paper,
 } from "@mui/material";
-// import { poseidon } from "circomlibjs";
 import { buildMimc7 } from "circomlibjs";
 
 export default function Post({ post }) {
   const [isLiking, setIsLiking] = useState(false);
   const [isDisliking, setIsDisliking] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isFunding, setIsFunding] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [status, setStatus] = useState("");
@@ -35,9 +32,9 @@ export default function Post({ post }) {
   const [salt, setSalt] = useState("");
 
   const router = useRouter();
-  // const postId = router.query._id as any;
-  const postId = post._id as any;
-  console.log(postId);
+  const postId = post._id as string;
+  const likes = post.likes as string;
+  const dislikes = post.dislikes as string;
 
   type TypedArray =
     | Int8Array
@@ -79,6 +76,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const account = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -88,13 +86,11 @@ export default function Post({ post }) {
 
     let identityCommitments: any = [];
 
-    const { zkNewsContract, account } = await getContract();
+    const { zkNewsContract } = await getContract();
 
-    const transactionResponse = await zkNewsContract.methods
+    identityCommitments = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call({ from: account, gas: 6721900 });
-
-    identityCommitments = transactionResponse;
+      .call({ from: account });
 
     const isIdentityIncludedBefore = identityCommitments.includes(
       identityCommitment.toString()
@@ -112,12 +108,14 @@ export default function Post({ post }) {
         identityCommitment,
         BigInt(2),
       ];
+
       const merkleProof = generateMerkleProof(
         20,
         BigInt(0),
         identityCommitmentsSemaphore,
         identityCommitment
       );
+
       const signal = "newLike";
 
       const witness = Semaphore.genWitness(
@@ -130,11 +128,11 @@ export default function Post({ post }) {
 
       const { proof, publicSignals } = await Semaphore.genProof(
         witness,
-        "./semaphore.wasm",
-        "./semaphore_final.zkey"
+        "../semaphore.wasm",
+        "../semaphore_final.zkey"
       );
 
-      const solidityProof = Semaphore.packToSolidityProof(proof);
+      const solidityProof = await Semaphore.packToSolidityProof(proof);
 
       try {
         await zkNewsContract.methods
@@ -146,18 +144,18 @@ export default function Post({ post }) {
             publicSignals.externalNullifier,
             solidityProof
           )
-          .send({ from: account, gas: 6721900 });
+          .send({ from: account, gas: 600000 });
       } catch (error) {
         setIsStatusChanged(true);
         setIdentityStatus(true);
         setIsLiking(false);
-        setStatus("You can not  like/dislike more than one!");
+        setStatus("You can not like or dislike more than one!");
         console.log(error);
         return;
       }
 
       try {
-        await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
+        await fetch(`http://localhost:3000/api/posts/${postId}`, {
           method: "PUT",
           headers: {
             Accept: "application/json",
@@ -173,7 +171,6 @@ export default function Post({ post }) {
       setIdentityStatus(false);
       setIsLiking(false);
       setStatus("Post have been liked successfully");
-      console.log("Your post have been liked successfully");
     }
   };
 
@@ -191,6 +188,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const account = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -200,13 +198,11 @@ export default function Post({ post }) {
 
     let identityCommitments: any = [];
 
-    const { zkNewsContract, account } = await getContract();
+    const { zkNewsContract } = await getContract();
 
-    const transactionResponse = await zkNewsContract.methods
+    identityCommitments = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call({ from: account, gas: 6721900 });
-
-    identityCommitments = transactionResponse;
+      .call({ from: account });
 
     const isIdentityIncludedBefore = identityCommitments.includes(
       identityCommitment.toString()
@@ -242,8 +238,8 @@ export default function Post({ post }) {
 
       const { proof, publicSignals } = await Semaphore.genProof(
         witness,
-        "./semaphore.wasm",
-        "./semaphore_final.zkey"
+        "../semaphore.wasm",
+        "../semaphore_final.zkey"
       );
 
       const solidityProof = Semaphore.packToSolidityProof(proof);
@@ -258,18 +254,18 @@ export default function Post({ post }) {
             publicSignals.externalNullifier,
             solidityProof
           )
-          .send({ from: account, gas: 6721900 });
+          .send({ from: account, gas: 600000 });
       } catch (error) {
         setIsStatusChanged(true);
         setIdentityStatus(true);
         setIsDisliking(false);
-        setStatus("You can not like/dislike more than one!");
+        setStatus("You can not dislike or like more than one!");
         console.log(error);
         return;
       }
 
       try {
-        await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
+        await fetch(`http://localhost:3000/api/posts/${postId}`, {
           method: "PUT",
           headers: {
             Accept: "application/json",
@@ -285,12 +281,19 @@ export default function Post({ post }) {
       setIdentityStatus(false);
       setIsDisliking(false);
       setStatus("Post have been disliked successfully");
-      console.log("Your post have been disliked successfully");
     }
   };
 
   const fundPost = async () => {
     setIsFunding(true);
+
+    if (fundAmount === "") {
+      setIsStatusChanged(true);
+      setIdentityStatus(true);
+      setStatus("You should define required parts!");
+      setIsFunding(false);
+      return;
+    }
 
     const amount = fundAmount;
 
@@ -301,6 +304,8 @@ export default function Post({ post }) {
       return;
     }
 
+    alert(`You are funding ${amount} MATIC`);
+
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
@@ -308,30 +313,47 @@ export default function Post({ post }) {
     const { zkNewsContract } = await getContract();
     const account = await signer.getAddress();
 
-    await zkNewsContract.methods
-      .fundPost(utils.formatBytes32String(postId))
-      .send({
-        from: account,
-        gas: 6721900,
-        value: ethers.utils.parseUnits(amount, "ether"),
-      });
+    try {
+      await zkNewsContract.methods
+        .fundPost(utils.formatBytes32String(postId))
+        .send({
+          from: account,
+          to: process.env.NEXT_PUBLIC_LOC_CONTRACT_ADDRESS,
+          gas: 600000,
+          value: ethers.utils.parseUnits(amount, "ether"),
+        });
+    } catch (error) {
+      setIsStatusChanged(true);
+      setIdentityStatus(true);
+      setIsFunding(false);
+      setStatus("Post has not funded!");
+      console.log(error);
+      return;
+    }
 
     setIsStatusChanged(true);
     setIdentityStatus(false);
     setIsFunding(false);
     setStatus("Post have been funded successfully");
-    console.log("Your post have been funded successfully");
     setFundAmount("");
   };
 
   const withdraw = async () => {
     setIsWithdrawing(true);
 
+    if (withdrawAmount === "" || salt === "") {
+      setIsStatusChanged(true);
+      setIdentityStatus(true);
+      setStatus("You should define required parts!");
+      setIsWithdrawing(false);
+      return;
+    }
+
     alert(
       "Only post owners are allowed to withdraw funds. If you are the owner of this post please keep going"
     );
 
-    const amount = utils.parseEther(withdrawAmount);
+    const amount = String(parseFloat(withdrawAmount) * 10e17);
 
     const provider = (await detectEthereumProvider()) as any;
     if (!provider) {
@@ -342,6 +364,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const account = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -350,25 +373,26 @@ export default function Post({ post }) {
     const identityCommitment = identity.genIdentityCommitment();
 
     const privateSalt = salt;
-    // const poseidon = buildPoseidon();
-    const mimc7 = (await buildMimc7()) as any;
-
-    const hashCommitment = buf2Bigint(
-      mimc7.hash(privateSalt, identityCommitment)
-    );
-
-    // const hashCommitment = poseidon([privateSalt, identityCommitment]);
-
-    const { zkNewsContract, account } = await getContract();
 
     try {
+      const mimc7 = (await buildMimc7()) as any;
+
+      const hashCommitment = buf2Bigint(
+        mimc7.hash(privateSalt, identityCommitment)
+      );
+
+      const { zkNewsContract } = await getContract();
+
       await zkNewsContract.methods
         .withdrawFunds(
           utils.formatBytes32String(postId),
           amount,
           hashCommitment
         )
-        .send({ from: account, gas: 6721900 });
+        .send({
+          from: account,
+          gas: 600000,
+        });
     } catch (error) {
       setIsStatusChanged(true);
       setIdentityStatus(true);
@@ -382,18 +406,50 @@ export default function Post({ post }) {
 
     setIsStatusChanged(true);
     setIdentityStatus(false);
-    setStatus(`${withdrawAmount} ETH has been withdrawn succesfully`);
+    setStatus(`${withdrawAmount} MATIC has been withdrawn succesfully`);
     setIsWithdrawing(false);
     setWithdrawAmount("");
     setSalt("");
-    console.log("Withdraw successfully");
+  };
+
+  const funds = async () => {
+    const provider = (await detectEthereumProvider()) as any;
+    if (!provider) {
+      alert("MetaMask not found");
+      return;
+    }
+
+    await provider.request({ method: "eth_requestAccounts" });
+    const ethersProvider = new providers.Web3Provider(provider);
+    const signer = ethersProvider.getSigner();
+    const account = await signer.getAddress();
+
+    try {
+      const { zkNewsContract } = await getContract();
+
+      const tx = await zkNewsContract.methods
+        .getPostFunds(utils.formatBytes32String(postId))
+        .call({ from: account });
+
+      const ethValue = await ethers.utils.formatEther(tx);
+
+      setStatus(`This Post has ${ethValue} MATIC`);
+    } catch (error) {
+      setIsStatusChanged(true);
+      setIdentityStatus(true);
+      setStatus("Funds not found");
+      console.log(error);
+      return;
+    }
+
+    setIsStatusChanged(true);
+    setIdentityStatus(false);
   };
 
   //This function is just for development. After deploymnet to mainnet it will be deleted
   const deletePost = async () => {
-    // const postId = router.query._id;
     try {
-      await fetch(`https://zknews.vercel.app/api/posts/${postId}`, {
+      await fetch(`http://localhost:3000/api/posts/${postId}`, {
         method: "Delete",
       });
 
@@ -427,195 +483,258 @@ export default function Post({ post }) {
     withdraw();
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
+  const getFunds = async (event: any) => {
+    event.preventDefault();
+    funds();
+  };
+
+  const handleDelete = async (event: any) => {
+    event.preventDefault();
     deletePost();
   };
 
-  // const [loading, setLoading] = useState(true);
-  // function handleClick() {
-  //   setLoading(true);
-  // }
-
   return (
     <div>
-      {isDeleting ? (
-        <LoadingButton
-          endIcon={<SendIcon />}
-          loadingPosition="end"
-          variant="contained"
+      <Container component="main" sx={{ mt: 8, mb: 2 }} maxWidth="sm">
+        <Box
+          sx={{
+            width: 700,
+            height: "auto",
+            backgroundColor: "light.gray",
+          }}
         >
-          Deleting
-        </LoadingButton>
-      ) : (
-        <>
-          <Container component="main" sx={{ mt: 8, mb: 2 }} maxWidth="sm">
-            <Box
+          <Paper
+            sx={{
+              p: 2,
+              pl: 4,
+              pr: 4,
+              mt: 1,
+            }}
+          >
+            <h1 className="text-8xl tracking-tight mb-4 font-extrabold text-gray-900 sm:text-3xl md:text-6xl">
+              {post.title}
+            </h1>
+          </Paper>
+          <Paper
+            sx={{
+              p: 2,
+              pl: 4,
+              pr: 4,
+              mt: 1,
+            }}
+          >
+            <img src={post.photoURL} alt={post.location} />
+          </Paper>
+          <Paper
+            sx={{
+              p: 2,
+              pl: 4,
+              pr: 4,
+              mt: 1,
+            }}
+          >
+            <h2 className="mt-3 text-base 	text-align: justify; text-gray-500 sm:mt-5 sm:text-lg sm:max-w-3xl sm:mx-auto md:mt-5 md:text-3xl lg:mx-0">
+              {post.news}
+            </h2>
+          </Paper>
+          {isLiking ? (
+            <CircularProgress />
+          ) : (
+            <Button
+              onClick={handleLike}
+              fullWidth
               sx={{
-                width: 700,
-                height: "auto",
-                backgroundColor: "light.gray",
+                color: "blue",
+                p: 2,
+              }}
+              variant="contained"
+            >
+              <span>Like {likes}</span>
+            </Button>
+          )}
+
+          {isDisliking ? (
+            <CircularProgress />
+          ) : (
+            <Button
+              onClick={handleDislike}
+              fullWidth
+              sx={{
+                color: "red",
+                p: 2,
+              }}
+              variant="contained"
+            >
+              Dislike {dislikes}
+            </Button>
+          )}
+
+          <Button onClick={handleDelete} size="small">
+            delete
+          </Button>
+        </Box>
+        {!isStatusChanged ? (
+          <></>
+        ) : (
+          <>
+            <Paper
+              sx={{
+                p: 1,
+                pl: 4,
+                pr: 4,
+                mt: 1,
+                width: "127%",
               }}
             >
-              <h1 className="text-8xl tracking-tight mb-4 font-extrabold text-gray-900 sm:text-3xl md:text-6xl">
-                {post.title}
-              </h1>
-              <img src={post.photoURL} alt={post.location} />
-              <h2 className="mt-3 text-base 	text-align: justify; text-gray-500 sm:mt-5 sm:text-lg sm:max-w-3xl sm:mx-auto md:mt-5 md:text-3xl lg:mx-0">
-                {post.news}
-              </h2>
+              <Alert severity={identityStatus ? "error" : "success"}>
+                {status}
+              </Alert>
+            </Paper>
+          </>
+        )}
 
-              {isLiking ? (
-                <CircularProgress />
-              ) : (
-                <Button onClick={handleLike} size="small">
-                  <span>Like {post.likes}</span>
-                </Button>
-              )}
-
-              {isDisliking ? (
-                <CircularProgress />
-              ) : (
-                <Button onClick={handleDislike} size="small" color="warning">
-                  Dislike {post.dislikes}
-                </Button>
-              )}
-
-              <Button onClick={handleDelete} size="small">
-                delete
-              </Button>
-            </Box>
-            {!isStatusChanged ? (
-              <></>
-            ) : (
-              <>
-                <Alert severity={identityStatus ? "error" : "success"}>
-                  {status}
-                </Alert>
-              </>
-            )}
-
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Box
-                    component="form"
-                    onSubmit={handleFund}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "200",
-                      mt: 2,
+        <Paper
+          sx={{
+            p: 2,
+            pl: 4,
+            pr: 4,
+            mt: 1,
+            width: "127%",
+          }}
+        >
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Box
+                  component="form"
+                  onSubmit={handleFund}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "200",
+                    mt: 2,
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    fullWidth
+                    required
+                    type="number"
+                    id="fund"
+                    label="Fund Amount (MATIC)"
+                    helperText="Specify the amount as matic"
+                    value={fundAmount}
+                    onChange={(e) => {
+                      setFundAmount(e.target.value);
                     }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <TextField
+                  />
+                  {isFunding ? (
+                    <CircularProgress />
+                  ) : (
+                    <Button
+                      type="submit"
+                      color="inherit"
                       fullWidth
-                      id="fund"
-                      label="Fund Amount (ONE)"
-                      helperText="Specify the amount as ether"
-                      value={fundAmount}
-                      onChange={(e) => {
-                        setFundAmount(e.target.value);
-                      }}
-                    />
-                    {isFunding ? (
-                      <CircularProgress />
-                    ) : (
-                      <Button
-                        type="submit"
-                        color="inherit"
-                        fullWidth
-                        variant="contained"
-                        endIcon={<SendIcon />}
-                        sx={{
-                          mt: 3,
-                          mb: 3,
-                          color: "blue",
-                          backgroundColor: "yellow",
-                        }}
-                      >
-                        Fund
-                      </Button>
-                    )}
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box
-                    component="form"
-                    onSubmit={handleWithdraw}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "200",
-                      mt: 2,
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <TextField
-                      fullWidth
-                      id="withdraw"
-                      label="Withdraw Amount (ONE)"
-                      value={withdrawAmount}
-                      onChange={(e) => {
-                        setWithdrawAmount(e.target.value);
-                      }}
-                    />
-                    <TextField
-                      fullWidth
-                      type="password"
-                      id="salt"
-                      label="Your Password"
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                      helperText="Specify the password to withdraw"
+                      variant="contained"
+                      endIcon={<SendIcon />}
                       sx={{
                         mt: 3,
+                        mb: 3,
                         color: "blue",
+                        backgroundColor: "orange",
                       }}
-                      value={salt}
-                      onChange={(e) => {
-                        setSalt(e.target.value);
-                      }}
-                    />
-                    {isWithdrawing ? (
-                      <CircularProgress />
-                    ) : (
-                      <Button
-                        type="submit"
-                        color="inherit"
-                        fullWidth
-                        variant="contained"
-                        endIcon={<SendIcon />}
-                        sx={{
-                          mt: 3,
-                          mb: 3,
-                          color: "red",
-                          backgroundColor: "yellow",
-                        }}
-                      >
-                        Withdraw Funds
-                      </Button>
-                    )}
-                  </Box>
-                </Grid>
+                    >
+                      Fund
+                    </Button>
+                  )}
+                </Box>
+                <Button
+                  color="inherit"
+                  fullWidth
+                  variant="contained"
+                  onClick={getFunds}
+                  sx={{
+                    mt: 3,
+                    mb: 3,
+                    color: "blue",
+                    backgroundColor: "orange",
+                  }}
+                >
+                  Current Funds
+                </Button>
               </Grid>
-            </Box>
-          </Container>
-        </>
-      )}
-      {/* <Confirm
-                open={confirm}
-                onCancel={close}
-                onConfirm={handleDelete}
-            /> */}
+              <Grid item xs={6}>
+                <Box
+                  component="form"
+                  onSubmit={handleWithdraw}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "200",
+                    mt: 2,
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    fullWidth
+                    required
+                    type="number"
+                    id="withdraw"
+                    label="Withdraw Amount (MATIC)"
+                    value={withdrawAmount}
+                    onChange={(e) => {
+                      setWithdrawAmount(e.target.value);
+                    }}
+                  />
+                  <TextField
+                    required
+                    fullWidth
+                    type="number"
+                    id="salt"
+                    label="Your Password"
+                    helperText="Specify the password to withdraw"
+                    sx={{
+                      mt: 3,
+                      color: "blue",
+                    }}
+                    value={salt}
+                    onChange={(e) => {
+                      setSalt(e.target.value);
+                    }}
+                  />
+                  {isWithdrawing ? (
+                    <CircularProgress />
+                  ) : (
+                    <Button
+                      type="submit"
+                      color="inherit"
+                      fullWidth
+                      variant="contained"
+                      endIcon={<SendIcon />}
+                      sx={{
+                        mt: 3,
+                        mb: 3,
+                        color: "orange",
+                        backgroundColor: "blue",
+                      }}
+                    >
+                      Withdraw Funds
+                    </Button>
+                  )}
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        </Paper>
+      </Container>
     </div>
   );
 }
 
 Post.getInitialProps = async ({ query: { _id } }) => {
-  const res = await fetch(`https://zknews.vercel.app/api/posts/${_id}`);
+  const res = await fetch(`http://localhost:3000/api/posts/${_id}`);
   const { data } = await res.json();
 
   return { post: data };

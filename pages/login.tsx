@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Strategy, ZkIdentity } from "@zk-kit/identity";
+const { Strategy, ZkIdentity } = require("@zk-kit/identity");
 import detectEthereumProvider from "@metamask/detect-provider";
 import { ethers, providers } from "ethers";
 import {
@@ -40,15 +40,14 @@ const Login = () => {
     const identity = new ZkIdentity(Strategy.MESSAGE, message);
     const identityCommitment = identity.genIdentityCommitment();
 
-    let identityCommitments: any = [];
-
-    const { zkNewsContract, account } = await getContract();
+    const { zkNewsContract } = await getContract();
+    const account = await signer.getAddress();
 
     const transactionResponse = await zkNewsContract.methods
       .getIdentityCommitments()
-      .call({ from: account, gas: 6721900 });
+      .call();
 
-    identityCommitments = transactionResponse;
+    let identityCommitments: any = transactionResponse;
 
     // checking previous identites off-chain
     const isIdentityIncludedBefore = identityCommitments.includes(
@@ -64,7 +63,7 @@ const Login = () => {
     } else {
       await zkNewsContract.methods
         .insertIdentityAsClient(ethers.BigNumber.from(identityCommitment))
-        .send({ from: account, gas: 6721900 });
+        .send({ from: account, gas: 600000 });
 
       setIsStatusChanged(true);
       setIdentityStatus(false);

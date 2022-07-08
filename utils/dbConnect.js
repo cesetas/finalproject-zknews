@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
-// import dotenv from "dotenv";
-// import { configuration } from "./constants";
 
 const connection = {};
-
-// dotenv.config();
 
 async function dbConnect() {
   if (connection.isConnected) {
@@ -20,13 +16,3 @@ async function dbConnect() {
 }
 
 export default dbConnect;
-
-export async function getServerSideProps() {
-  // console.log(process.env.CONNECTION_URL);
-
-  return {
-    props: {
-      hello: "world",
-    },
-  };
-}

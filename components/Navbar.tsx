@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useEffect } from "react";
-// import { MenuIcon } from "@heroicons/react/outline";
 import { useMoralis } from "react-moralis";
 import { ConnectButton } from "web3uikit";
 import Link from "next/link";
@@ -36,9 +35,6 @@ const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
-  // const handleOpenNavMenu = (event: any) => {
-  //   setAnchorElNav(event.currentTarget);
-  // };
   const handleOpenUserMenu = (event: any) => {
     setAnchorElUser(event.currentTarget);
   };
@@ -51,28 +47,6 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  //   useEffect(() => {
-  //     ;(async () => {
-  //         const ethereumProvider = (await detectEthereumProvider()) as any
-  //         const accounts = await ethereumProvider.request({ method: "eth_accounts" })
-  //         const ethersProvider = new providers.Web3Provider(ethereumProvider)
-
-  //         if (accounts[0]) {
-  //             setAccount(getAddress(accounts[0]))
-  //             setSigner(ethersProvider.getSigner())
-  //         }
-
-  //         ethereumProvider.on("accountsChanged", (newAccounts: string[]) => {
-  //             if (newAccounts.length !== 0) {
-  //                 setAccount(getAddress(newAccounts[0]))
-  //                 setSigner(ethersProvider.getSigner())
-  //             } else {
-  //                 setAccount(undefined)
-  //                 setSigner(undefined)
-  //             }
-  //         })
-  //     })()
-  // }, [])
   const {
     enableWeb3,
     account,
@@ -81,29 +55,6 @@ const Navbar = () => {
     Moralis,
     deactivateWeb3,
   } = useMoralis();
-
-  // const connectWallet = async () => {
-  //   if (!window.ethereum) {
-  //     alert("Install metamask!");
-  //     return;
-  //   }
-
-  //   await enableWeb3();
-  //   console.log(account);
-  //   setMyAccount(account);
-
-  //   // try {
-  //   //   const accounts = await ethereum.request({
-  //   //     method: "eth_requestAccounts",
-  //   //   });
-  //   //   console.log("account[0]: ", accounts[0]);
-  //   //   setAccount(accounts[0]);
-  //   // } catch (err) {
-  //   //   console.log(err);
-  //   // }
-  // };
-  // // useEffect(() => {}, []);
-  // useEffect(() => {}, [isWeb3Enabled]);
 
   useEffect(() => {
     if (isWeb3Enabled) return;
@@ -114,9 +65,6 @@ const Navbar = () => {
       }
     }
   }, [isWeb3Enabled]);
-  // no array, run on every render
-  // empty array, run once
-  // dependency array, run when the stuff in it changesan
 
   useEffect(() => {
     Moralis.onAccountChanged((account) => {
@@ -178,16 +126,6 @@ const Navbar = () => {
             </Link>
 
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              {/* <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton> */}
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElNav}
@@ -316,9 +254,10 @@ const Navbar = () => {
 
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  {/* <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" /> */}
-                </IconButton>
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{ p: 0 }}
+                ></IconButton>
               </Tooltip>
               <Menu
                 sx={{ mt: "45px" }}
@@ -342,23 +281,17 @@ const Navbar = () => {
                   </MenuItem>
                 ))}
               </Menu>
+              <div className="display-flex mb-1">
+                <div className="ml-3">
+                  <Link href="/login">
+                    <Button color="inherit">Registration</Button>
+                  </Link>
+                </div>
 
-              <Link href="/login">
-                <Button color="inherit">Registration</Button>
-              </Link>
-
-              {/* {account ? (
-                <Button color="inherit">
-                  {account.slice(2, 6)}...{account.slice(account.length - 4)}
-                </Button>
-              ) : (
-                <Button onClick={connectWallet} color="inherit">
-                  Connect Wallet
-                  {myAccount}
-                </Button>
-              )} */}
-
-              <ConnectButton moralisAuth={false} />
+                <div className="mb-2 mr-2">
+                  <ConnectButton moralisAuth={false} />
+                </div>
+              </div>
             </Box>
           </Toolbar>
         </Container>

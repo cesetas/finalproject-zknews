@@ -7,7 +7,8 @@ const MainBody = () => {
       <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
         <img
           className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-          src="https://media.istockphoto.com/photos/news-picture-id186122083"
+          src="https://images.pexels.com/photos/518543/pexels-photo-518543.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+          "
           alt=""
         />
       </div>
@@ -31,7 +32,7 @@ const MainBody = () => {
                   <Link href="/postnews">
                     <a
                       href="#"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-brown-200 bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
                     >
                       Post
                     </a>
@@ -41,7 +42,7 @@ const MainBody = () => {
                   <Link href="/news">
                     <a
                       href="#"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-yellow-700 bg-yellow-100 hover:bg-yellow-200 md:py-4 md:text-lg md:px-10"
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-yellow-700 hover:bg-yellow-500 md:py-4 md:text-lg md:px-10"
                     >
                       Explore
                     </a>

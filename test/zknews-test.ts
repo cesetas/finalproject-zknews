@@ -84,7 +84,6 @@ describe("zkNews", function () {
     bytes32SignalDislike = ethers.utils.formatBytes32String(signals[1]);
 
     postId = ethers.utils.formatBytes32String("123");
-    console.log("teste hazır");
   });
 
   it("Should Alice register", async () => {

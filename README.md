@@ -6,7 +6,10 @@ This project on which news and articles are published by its registered members,
 - Testnet site:
 - 'Live'' site:
 
-# Features
+# How It Works
+
+The frontend built with Next.js&React and the Contracts was deployed on Harmony blockchain. The three interfaces will come together to provide the users with a complete platform where they can anonymously vote a poll and the records will be stored on the blockchain.
+No personally identifiable data is stored on the backend servers or the blockchain and each user is identified with their identity commitment that is either stored on the browser or by the user.
 
 ## Post news
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
-import { Strategy, ZkIdentity } from "@zk-kit/identity";
+const { Strategy, ZkIdentity } = require("@zk-kit/identity");
 import { providers, utils } from "ethers";
 import { getContract } from "../utils/contract";
 import Link from "next/link";
@@ -70,6 +70,20 @@ function PostNews() {
   const createPost = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
+    const privateSalt = commitment;
+
+    if (
+      privateSalt === "" ||
+      values.category === "" ||
+      values.location === "" ||
+      values.title === ""
+    ) {
+      setIsStatusChanged(true);
+      setIdentityStatus(true);
+      setStatus("You should define required parts!");
+      setIsSubmitting(false);
+      return;
+    }
 
     const provider = (await detectEthereumProvider()) as any;
 
@@ -81,6 +95,7 @@ function PostNews() {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const account = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -91,15 +106,16 @@ function PostNews() {
     let currentIdentityCommitments: any = [];
 
     try {
-      const { zkNewsContract, account } = await getContract();
+      const { zkNewsContract } = await getContract();
 
       const transactionResponse = await zkNewsContract.methods
         .getIdentityCommitments()
-        .call({ from: account, gas: 6721900 });
+        .call({ from: account });
 
       currentIdentityCommitments = transactionResponse;
     } catch (error: any) {
       console.log(error || "Failed to get");
+      setIsSubmitting(false);
     }
 
     const isIdentityIncludedBefore = currentIdentityCommitments.includes(
@@ -127,26 +143,43 @@ function PostNews() {
 
       const privateSalt = commitment;
 
+      if (privateSalt === "") {
+        setIsStatusChanged(true);
+        setIdentityStatus(true);
+        setStatus("You should define a private key!");
+        setIsSubmitting(false);
+        deletePost(postId);
+        return;
+      }
+
       const mimc7 = (await buildMimc7()) as any;
 
       const hashCommitment = buf2Bigint(
         mimc7.hash(privateSalt, identityCommitment)
       );
 
-      console.log("hash commitment :" + hashCommitment);
+      try {
+        const { zkNewsContract } = await getContract();
 
-      const { zkNewsContract, account } = await getContract();
+        const tx = await zkNewsContract.methods
+          .postNews(utils.formatBytes32String(postId), hashCommitment)
+          .send({ from: account, gas: 90000 });
+        // await tx.wait(1);
 
-      await zkNewsContract.methods
-        .postNews(utils.formatBytes32String(postId), hashCommitment)
-        .send({ from: account, gas: 6721900 });
-
-      console.log("14");
-      setIsStatusChanged(true);
-      setIdentityStatus(false);
-      setStatus("Your post have been published successfully");
-      setIsSubmitting(false);
-      setCommitment("");
+        setIsStatusChanged(true);
+        setIdentityStatus(false);
+        setStatus("Your post have been published successfully");
+        setIsSubmitting(false);
+        setCommitment("");
+      } catch (error) {
+        setIsStatusChanged(true);
+        setIdentityStatus(true);
+        setStatus("Your post have not been published!");
+        setCommitment("");
+        console.log(error);
+        setIsSubmitting(false);
+        deletePost(postId);
+      }
     }
   };
 
@@ -165,6 +198,16 @@ function PostNews() {
   function handleClick() {
     setLoading(true);
   }
+
+  const deletePost = async (_id) => {
+    try {
+      await fetch(`http://localhost:3000/api/posts/${_id}`, {
+        method: "Delete",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div>

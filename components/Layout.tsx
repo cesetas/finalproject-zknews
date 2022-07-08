@@ -1,7 +1,6 @@
 import Head from "next/head";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { AppProps } from "next/app";
 
 interface ChildrenProps {
   children: any;
@@ -10,7 +9,7 @@ interface ChildrenProps {
 const Layout: React.FC<ChildrenProps> = ({ children }) => (
   <>
     <Head>
-      <title>zkNews App</title>
+      <title>zkNews</title>
     </Head>
     <Navbar />
     {children}

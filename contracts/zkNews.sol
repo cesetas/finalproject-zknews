@@ -59,28 +59,6 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
     }
 
 
-    // function register(
-    //     bytes32 signal,
-    //     uint256 root,
-    //     uint256 nullifierHash,
-    //     uint256 externalNullifier,
-    //     uint256[8] calldata proof
-    // )
-    //     external 
-    // {
-    //     _verifyProof(
-    //             signal,
-    //             root,
-    //             nullifierHash,
-    //             externalNullifier,
-    //             proof,
-    //             verifier
-    //         );
-
-    //     _saveNullifierHash(nullifierHash);
-    //     emit Registration(signal);
-    // }
-
     function postNews(
         bytes32 postId,
         uint hashCommitment
@@ -157,7 +135,8 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
     }
 
     
-    function withdrawFunds(bytes32 _postId, uint _amount, uint _hashCommitment) public {
+    function withdrawFunds(bytes32 _postId, uint _amount, uint _hashCommitment) public payable {
+        require(_amount>0, "must be positive");
         require(_amount <= posts[_postId].balance,"Not enough balance");
         require(_hashCommitment == posts[_postId].hashCommitment,"Your hashcommitment is wrong");
         payable(msg.sender).transfer(_amount);
@@ -166,6 +145,8 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
     }
 
     function  fundPost( bytes32 postId ) payable public {
+        require(msg.value>0, "must be more than zero");
+        require(posts[postId].likes >= posts[postId].dislikes, "This post can not be funded");
         posts[postId].balance += msg.value;
          emit Funded(postId);
     }

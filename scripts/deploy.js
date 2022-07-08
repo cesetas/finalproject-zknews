@@ -1,5 +1,4 @@
 const hre = require("hardhat");
-const contractOwner = require("../src/utils/constants/contractOwner.json");
 
 async function main() {
   // Semaphore verifier
@@ -18,8 +17,6 @@ async function main() {
   console.log("zkNews deployed to:", zkNews.address);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {
