@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Strategy, ZkIdentity } from "@zk-kit/identity";
 const { generateMerkleProof, Semaphore } = require("@zk-kit/protocols");
 import { ethers, providers, utils } from "ethers";
-import { getContract } from "../../utils/contract";
+import abi from "../../abi/zkNews.json";
 import fetch from "isomorphic-unfetch";
 import { useRouter } from "next/router";
 import SendIcon from "@mui/icons-material/Send";
@@ -18,6 +18,7 @@ import {
   Paper,
 } from "@mui/material";
 import { buildMimc7 } from "circomlibjs";
+import Link from "next/link";
 
 export default function Post({ post }) {
   const [isLiking, setIsLiking] = useState(false);
@@ -30,11 +31,33 @@ export default function Post({ post }) {
   const [fundAmount, setFundAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [salt, setSalt] = useState("");
+  const [likes, setLikes] = useState(post.likes);
+  const [dislikes, setDislikes] = useState(post.dislikes);
 
   const router = useRouter();
   const postId = post._id as string;
-  const likes = post.likes as string;
-  const dislikes = post.dislikes as string;
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/api/posts/${postId}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...post, likes: likes }),
+    });
+  }, [likes]);
+
+  useEffect(() => {
+    fetch(`http://localhost:3000/api/posts/${postId}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...post, dislikes: dislikes }),
+    });
+  }, [dislikes]);
 
   type TypedArray =
     | Int8Array
@@ -76,7 +99,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
-    const account = await signer.getAddress();
+    const senderAccount = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -84,13 +107,19 @@ export default function Post({ post }) {
     const identity = new ZkIdentity(Strategy.MESSAGE, message);
     const identityCommitment = identity.genIdentityCommitment();
 
+    const zkNewsContract = await new ethers.Contract(
+      process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+      abi.abi,
+      signer
+    );
+
     let identityCommitments: any = [];
 
-    const { zkNewsContract } = await getContract();
+    const transactionResponse = await zkNewsContract.getIdentityCommitments();
 
-    identityCommitments = await zkNewsContract.methods
-      .getIdentityCommitments()
-      .call({ from: account });
+    for (var i = 0; i < transactionResponse.length; i++) {
+      identityCommitments.push(transactionResponse[i].toString());
+    }
 
     const isIdentityIncludedBefore = identityCommitments.includes(
       identityCommitment.toString()
@@ -135,16 +164,16 @@ export default function Post({ post }) {
       const solidityProof = await Semaphore.packToSolidityProof(proof);
 
       try {
-        await zkNewsContract.methods
-          .likePost(
-            utils.formatBytes32String(postId),
-            utils.formatBytes32String(signal),
-            merkleProof.root,
-            publicSignals.nullifierHash,
-            publicSignals.externalNullifier,
-            solidityProof
-          )
-          .send({ from: account, gas: 600000 });
+        const tx1 = await zkNewsContract.likePost(
+          utils.formatBytes32String(postId),
+          utils.formatBytes32String(signal),
+          merkleProof.root,
+          publicSignals.nullifierHash,
+          publicSignals.externalNullifier,
+          solidityProof,
+          { from: senderAccount, gasLimit: 1000000 }
+        );
+        await tx1.wait();
       } catch (error) {
         setIsStatusChanged(true);
         setIdentityStatus(true);
@@ -155,14 +184,10 @@ export default function Post({ post }) {
       }
 
       try {
-        await fetch(`http://localhost:3000/api/posts/${postId}`, {
-          method: "PUT",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ likes: post.likes++ }),
-        });
+        let numLikes = await zkNewsContract.getPostLikes(
+          utils.formatBytes32String(postId)
+        );
+        setLikes(numLikes.toString());
       } catch (error) {
         setIsLiking(false);
         console.log(error);
@@ -170,7 +195,7 @@ export default function Post({ post }) {
       setIsStatusChanged(true);
       setIdentityStatus(false);
       setIsLiking(false);
-      setStatus("Post have been liked successfully");
+      setStatus("Post has been liked successfully");
     }
   };
 
@@ -188,7 +213,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
-    const account = await signer.getAddress();
+    const senderAccount = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -196,13 +221,19 @@ export default function Post({ post }) {
     const identity = new ZkIdentity(Strategy.MESSAGE, message);
     const identityCommitment = identity.genIdentityCommitment();
 
+    const zkNewsContract = await new ethers.Contract(
+      process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+      abi.abi,
+      signer
+    );
+
     let identityCommitments: any = [];
 
-    const { zkNewsContract } = await getContract();
+    const transactionResponse = await zkNewsContract.getIdentityCommitments();
 
-    identityCommitments = await zkNewsContract.methods
-      .getIdentityCommitments()
-      .call({ from: account });
+    for (var i = 0; i < transactionResponse.length; i++) {
+      identityCommitments.push(transactionResponse[i].toString());
+    }
 
     const isIdentityIncludedBefore = identityCommitments.includes(
       identityCommitment.toString()
@@ -245,16 +276,16 @@ export default function Post({ post }) {
       const solidityProof = Semaphore.packToSolidityProof(proof);
 
       try {
-        await zkNewsContract.methods
-          .dislikePost(
-            utils.formatBytes32String(postId),
-            utils.formatBytes32String(signal),
-            merkleProof.root,
-            publicSignals.nullifierHash,
-            publicSignals.externalNullifier,
-            solidityProof
-          )
-          .send({ from: account, gas: 600000 });
+        const tx2 = await zkNewsContract.dislikePost(
+          utils.formatBytes32String(postId),
+          utils.formatBytes32String(signal),
+          merkleProof.root,
+          publicSignals.nullifierHash,
+          publicSignals.externalNullifier,
+          solidityProof,
+          { from: senderAccount, gasLimit: 1000000, gasPrice: 40000000000 }
+        );
+        await tx2.wait();
       } catch (error) {
         setIsStatusChanged(true);
         setIdentityStatus(true);
@@ -265,14 +296,11 @@ export default function Post({ post }) {
       }
 
       try {
-        await fetch(`http://localhost:3000/api/posts/${postId}`, {
-          method: "PUT",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ likes: post.dislikes++ }),
-        });
+        let numDislikes = await zkNewsContract.getPostDislikes(
+          utils.formatBytes32String(postId)
+        );
+
+        setDislikes(numDislikes.toString());
       } catch (error) {
         setIsDisliking(false);
         console.log(error);
@@ -280,7 +308,7 @@ export default function Post({ post }) {
       setIsStatusChanged(true);
       setIdentityStatus(false);
       setIsDisliking(false);
-      setStatus("Post have been disliked successfully");
+      setStatus("Post has been disliked successfully");
     }
   };
 
@@ -309,19 +337,25 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const senderAccount = await signer.getAddress();
 
-    const { zkNewsContract } = await getContract();
-    const account = await signer.getAddress();
+    const zkNewsContract = await new ethers.Contract(
+      process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+      abi.abi,
+      signer
+    );
 
     try {
-      await zkNewsContract.methods
-        .fundPost(utils.formatBytes32String(postId))
-        .send({
-          from: account,
-          to: process.env.NEXT_PUBLIC_LOC_CONTRACT_ADDRESS,
-          gas: 600000,
+      const txfund = await zkNewsContract.fundPost(
+        utils.formatBytes32String(postId),
+        {
+          from: senderAccount,
+          gasLimit: 600000,
+          gasPrice: 40000000000,
           value: ethers.utils.parseUnits(amount, "ether"),
-        });
+        }
+      );
+      await txfund.wait();
     } catch (error) {
       setIsStatusChanged(true);
       setIdentityStatus(true);
@@ -334,7 +368,7 @@ export default function Post({ post }) {
     setIsStatusChanged(true);
     setIdentityStatus(false);
     setIsFunding(false);
-    setStatus("Post have been funded successfully");
+    setStatus("Post has been funded successfully");
     setFundAmount("");
   };
 
@@ -364,7 +398,7 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
-    const account = await signer.getAddress();
+    const senderAccount = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -381,18 +415,23 @@ export default function Post({ post }) {
         mimc7.hash(privateSalt, identityCommitment)
       );
 
-      const { zkNewsContract } = await getContract();
+      const zkNewsContract = await new ethers.Contract(
+        process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+        abi.abi,
+        signer
+      );
 
-      await zkNewsContract.methods
-        .withdrawFunds(
-          utils.formatBytes32String(postId),
-          amount,
-          hashCommitment
-        )
-        .send({
-          from: account,
-          gas: 600000,
-        });
+      const tx3 = await zkNewsContract.withdrawFunds(
+        utils.formatBytes32String(postId),
+        amount,
+        hashCommitment,
+        {
+          from: senderAccount,
+          gasLimit: 1000000,
+          gasPrice: 40000000000,
+        }
+      );
+      await tx3.wait();
     } catch (error) {
       setIsStatusChanged(true);
       setIdentityStatus(true);
@@ -422,15 +461,18 @@ export default function Post({ post }) {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
-    const account = await signer.getAddress();
+    const senderAccount = await signer.getAddress();
 
     try {
-      const { zkNewsContract } = await getContract();
+      const zkNewsContract = await new ethers.Contract(
+        process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+        abi.abi,
+        signer
+      );
 
-      const tx = await zkNewsContract.methods
-        .getPostFunds(utils.formatBytes32String(postId))
-        .call({ from: account });
-
+      const tx = await zkNewsContract.getPostFunds(
+        utils.formatBytes32String(postId)
+      );
       const ethValue = await ethers.utils.formatEther(tx);
 
       setStatus(`This Post has ${ethValue} MATIC`);
@@ -728,6 +770,16 @@ export default function Post({ post }) {
             </Grid>
           </Box>
         </Paper>
+        <Link href="/postnews">
+          <Button fullWidth sx={{ color: "blue", mb: "4" }} variant="contained">
+            Post news
+          </Button>
+        </Link>
+        <Link href="/">
+          <Button fullWidth sx={{ color: "blue" }} variant="contained">
+            Back to Home
+          </Button>
+        </Link>
       </Container>
     </div>
   );

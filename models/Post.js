@@ -6,18 +6,21 @@ const PostSchema = new mongoose.Schema({
   location: String,
   news: String,
   photoURL: String,
+  likes: String,
+  dislikes: String,
   createdAt: {
     type: Date,
     default: new Date(),
   },
-  likes: {
-    type: [String],
-    default: [],
-  },
-  dislikes: {
-    type: [String],
-    default: [],
-  },
 });
 
 module.exports = mongoose.models.Post || mongoose.model("Post", PostSchema);
+
+// likes: {
+//   type: [String],
+//   default: [],
+// },
+// dislikes: {
+//   type: [String],
+//   default: [],
+// },

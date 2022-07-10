@@ -33,8 +33,6 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
 
     // event Registration(bytes32 signal);
     event NewPost(bytes32 postId);
-    event PostLiked(bytes32 postId, uint256 likes);
-    event PostDisliked(bytes32 postId, uint256 dislikes);
     event IdentityCommitment(uint256 indexed identityCommitment);
     event Withdrawal(bytes32 postId, uint256 balance);
     event Funded(bytes32 postId);
@@ -94,7 +92,6 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
         
         _saveNullifierHash(nullifierHash);
 
-        emit PostLiked(postId, posts[postId].likes);
         return (posts[postId].likes);
     }
 
@@ -122,7 +119,6 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
         
         _saveNullifierHash(nullifierHash);
 
-        emit PostDisliked(postId, posts[postId].dislikes);
         return (posts[postId].dislikes);
     }
 
@@ -132,6 +128,14 @@ contract zkNews is SemaphoreCore, SemaphoreGroups, Ownable {
 
     function getPostFunds(bytes32 postId) external view returns (uint256) {
         return posts[postId].balance;
+    }
+
+    function getPostLikes(bytes32 postId) external view returns (uint256) {
+        return posts[postId].likes;
+    }
+
+    function getPostDislikes(bytes32 postId) external view returns (uint256) {
+        return posts[postId].dislikes;
     }
 
     

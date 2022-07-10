@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 const { Strategy, ZkIdentity } = require("@zk-kit/identity");
-import { providers, utils } from "ethers";
-import { getContract } from "../utils/contract";
+import { ethers, providers, utils } from "ethers";
 import Link from "next/link";
 import {
   Button,
@@ -20,6 +19,7 @@ import SendIcon from "@mui/icons-material/Send";
 import fetch from "isomorphic-unfetch";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { buildMimc7 } from "circomlibjs";
+import abi from "../abi/zkNews.json";
 
 const theme = createTheme();
 
@@ -29,8 +29,8 @@ const initialvalues = {
   location: "",
   news: "",
   photoURL: "",
-  likes: 0,
-  dislikes: 0,
+  likes: "0",
+  dislikes: "0",
 };
 
 function PostNews() {
@@ -95,7 +95,7 @@ function PostNews() {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
-    const account = await signer.getAddress();
+    const senderAccount = await signer.getAddress();
     const message = await signer.signMessage(
       "Please sign the message to continue"
     );
@@ -106,13 +106,18 @@ function PostNews() {
     let currentIdentityCommitments: any = [];
 
     try {
-      const { zkNewsContract } = await getContract();
+      // const { zkNewsContract, account } = await getContract();
+      const zkNewsContract = await new ethers.Contract(
+        process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+        abi.abi,
+        signer
+      );
 
-      const transactionResponse = await zkNewsContract.methods
-        .getIdentityCommitments()
-        .call({ from: account });
+      const transactionResponse = await zkNewsContract.getIdentityCommitments();
 
-      currentIdentityCommitments = transactionResponse;
+      for (var i = 0; i < transactionResponse.length; i++) {
+        currentIdentityCommitments.push(transactionResponse[i].toString());
+      }
     } catch (error: any) {
       console.log(error || "Failed to get");
       setIsSubmitting(false);
@@ -159,12 +164,18 @@ function PostNews() {
       );
 
       try {
-        const { zkNewsContract } = await getContract();
+        const zkNewsContract = await new ethers.Contract(
+          process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+          abi.abi,
+          signer
+        );
 
-        const tx = await zkNewsContract.methods
-          .postNews(utils.formatBytes32String(postId), hashCommitment)
-          .send({ from: account, gas: 90000 });
-        // await tx.wait(1);
+        const tx = await zkNewsContract.postNews(
+          utils.formatBytes32String(postId),
+          hashCommitment,
+          { from: senderAccount, gasLimit: 1000000 }
+        );
+        await tx.wait();
 
         setIsStatusChanged(true);
         setIdentityStatus(false);

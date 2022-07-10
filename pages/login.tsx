@@ -12,7 +12,7 @@ import {
   Grid,
 } from "@mui/material/";
 import Link from "next/link";
-import { getContract } from "../utils/contract";
+import abi from "../abi/zkNews.json";
 
 const Login = () => {
   const [isLoging, setIsLoging] = React.useState(false);
@@ -32,6 +32,7 @@ const Login = () => {
     await provider.request({ method: "eth_requestAccounts" });
     const ethersProvider = new providers.Web3Provider(provider);
     const signer = ethersProvider.getSigner();
+    const senderAccount = await signer.getAddress();
 
     const message = await signer.signMessage(
       "Please sign the message to continue"
@@ -40,14 +41,18 @@ const Login = () => {
     const identity = new ZkIdentity(Strategy.MESSAGE, message);
     const identityCommitment = identity.genIdentityCommitment();
 
-    const { zkNewsContract } = await getContract();
-    const account = await signer.getAddress();
+    // const { zkNewsContract, account } = await getContract();
+    const zkNewsContract = await new ethers.Contract(
+      process.env.NEXT_PUBLIC_TEST_CONTRACT_ADDRESS,
+      abi.abi,
+      signer
+    );
+    let identityCommitments: any = [];
+    const transactionResponse = await zkNewsContract.getIdentityCommitments();
 
-    const transactionResponse = await zkNewsContract.methods
-      .getIdentityCommitments()
-      .call();
-
-    let identityCommitments: any = transactionResponse;
+    for (var i = 0; i < transactionResponse.length; i++) {
+      identityCommitments.push(transactionResponse[i].toString());
+    }
 
     // checking previous identites off-chain
     const isIdentityIncludedBefore = identityCommitments.includes(
@@ -61,9 +66,12 @@ const Login = () => {
       setStatus("This account has already been registered before!");
       return;
     } else {
-      await zkNewsContract.methods
-        .insertIdentityAsClient(ethers.BigNumber.from(identityCommitment))
-        .send({ from: account, gas: 600000 });
+      const tx = await zkNewsContract.insertIdentityAsClient(
+        ethers.BigNumber.from(identityCommitment),
+        { from: senderAccount, gasLimit: 1000000 }
+      );
+
+      await tx.wait();
 
       setIsStatusChanged(true);
       setIdentityStatus(false);
