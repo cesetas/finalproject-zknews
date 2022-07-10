@@ -134,14 +134,17 @@ function PostNews() {
       setStatus("You should complete the registration process before posting.");
       return;
     } else {
-      const res = await fetch("http://localhost:3000/api/posts", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
 
       const data = await res.json();
       const postId = data.data._id;
@@ -212,7 +215,7 @@ function PostNews() {
 
   const deletePost = async (_id) => {
     try {
-      await fetch(`http://localhost:3000/api/posts/${_id}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts/${_id}`, {
         method: "Delete",
       });
     } catch (error) {

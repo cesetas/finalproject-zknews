@@ -38,7 +38,7 @@ export default function Post({ post }) {
   const postId = post._id as string;
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/posts/${postId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts/${postId}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -49,7 +49,7 @@ export default function Post({ post }) {
   }, [likes]);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/posts/${postId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts/${postId}`, {
       method: "PUT",
       headers: {
         Accept: "application/json",
@@ -491,7 +491,7 @@ export default function Post({ post }) {
   //This function is just for development. After deploymnet to mainnet it will be deleted
   const deletePost = async () => {
     try {
-      await fetch(`http://localhost:3000/api/posts/${postId}`, {
+      await fetch(`${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts/${postId}`, {
         method: "Delete",
       });
 
@@ -786,7 +786,9 @@ export default function Post({ post }) {
 }
 
 Post.getInitialProps = async ({ query: { _id } }) => {
-  const res = await fetch(`http://localhost:3000/api/posts/${_id}`);
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts/${_id}`
+  );
   const { data } = await res.json();
 
   return { post: data };

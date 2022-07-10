@@ -79,7 +79,7 @@ export default function news({ posts }) {
 }
 
 news.getInitialProps = async () => {
-  const res = await fetch("http://localhost:3000/api/posts");
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DOMAIN_LOC}api/posts`);
   const { data } = await res.json();
 
   return { posts: data };
