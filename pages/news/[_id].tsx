@@ -553,7 +553,7 @@ export default function Post({ post }) {
               mt: 1,
             }}
           >
-            <h1 className="text-8xl tracking-tight mb-4 font-extrabold text-gray-900 sm:text-3xl md:text-6xl">
+            <h1 className="tracking-tight mb-4 font-extrabold text-gray-700 sm:text-3xl md:text-5xl lg:text-6xl xl:text-8xl">
               {post.title}
             </h1>
           </Paper>
