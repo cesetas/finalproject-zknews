@@ -41,7 +41,7 @@ export default function news({ posts }) {
                 xl={1}
                 key={filteredPost._id}
               >
-                <Link href={`/${filteredPost._id}`}>
+                <Link href={`news/${filteredPost._id}`}>
                   <Card
                     sx={{
                       minWidth: 500,
@@ -78,7 +78,15 @@ export default function news({ posts }) {
         <br />
 
         <Link href="/">
-          <Button fullWidth variant="contained">
+          <Button
+            fullWidth
+            sx={{
+              mb: 3,
+              color: "white",
+              backgroundColor: "blue",
+            }}
+            variant="contained"
+          >
             Back to Home
           </Button>
         </Link>

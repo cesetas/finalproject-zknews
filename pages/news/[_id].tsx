@@ -585,9 +585,12 @@ export default function Post({ post }) {
             <Button
               onClick={handleLike}
               fullWidth
+              size="large"
               sx={{
-                color: "blue",
-                p: 2,
+                mt: 3,
+                mb: 3,
+                color: "white",
+                backgroundColor: "blue",
               }}
               variant="contained"
             >
@@ -601,9 +604,10 @@ export default function Post({ post }) {
             <Button
               onClick={handleDislike}
               fullWidth
+              size="large"
+              color="error"
               sx={{
-                color: "red",
-                p: 2,
+                mb: 3,
               }}
               variant="contained"
             >
@@ -771,12 +775,29 @@ export default function Post({ post }) {
           </Box>
         </Paper>
         <Link href="/postnews">
-          <Button fullWidth sx={{ color: "blue", mb: "4" }} variant="contained">
+          <Button
+            fullWidth
+            sx={{
+              mt: 3,
+              mb: 3,
+              color: "white",
+              backgroundColor: "blue",
+            }}
+            variant="contained"
+          >
             Post news
           </Button>
         </Link>
         <Link href="/">
-          <Button fullWidth sx={{ color: "blue" }} variant="contained">
+          <Button
+            fullWidth
+            sx={{
+              mb: 3,
+              color: "white",
+              backgroundColor: "blue",
+            }}
+            variant="contained"
+          >
             Back to Home
           </Button>
         </Link>
