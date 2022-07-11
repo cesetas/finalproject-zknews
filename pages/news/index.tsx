@@ -64,7 +64,11 @@ export default function news({ posts }) {
         <br />
 
         <Link href="/postnews">
-          <Button fullWidth sx={{ color: "blue", mb: "4" }} variant="contained">
+          <Button
+            fullWidth
+            sx={{ color: "blue", mb: "4px" }}
+            variant="contained"
+          >
             Post news
           </Button>
         </Link>
