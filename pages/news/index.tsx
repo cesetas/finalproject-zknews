@@ -15,7 +15,7 @@ export default function news({ posts }) {
     <>
       <Container fixed>
         <Typography color="blue" variant="h3" component="div">
-          NEWS & ARTICLES
+          NEWS
         </Typography>
         <Grid
           container

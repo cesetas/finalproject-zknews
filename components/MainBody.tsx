@@ -24,8 +24,7 @@ const MainBody = () => {
                 This dApp provides a censor free environment with reward
                 mechanism for journalists to publish their views, thoughts and
                 real news for the sake of public. It allows any users to
-                register in order to publish, like, dislike, and fund the
-                news/articles.
+                register in order to publish, like, dislike, and fund the news.
               </p>
               <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
