@@ -37,8 +37,8 @@ export default function news({ posts }) {
                     <CardMedia
                       component="img"
                       sx={{
-                        maxHeight: "50px",
-                        minHeight: "50px",
+                        maxHeight: "250px",
+                        minHeight: "200px",
                       }}
                       image={post.photoURL}
                       alt={post.location}
