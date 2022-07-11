@@ -25,40 +25,42 @@ export default function news({ posts }) {
           {posts.map((post, _id) => {
             return (
               <Grid item xs={1} sm={1} md={1} lg={1} xl={1} key={_id}>
-                <Card
-                  sx={{
-                    minWidth: 300,
-                    maxWidth: 600,
-                    minHeight: 200,
-                    maxHeight: 800,
-                  }}
-                >
-                  <CardMedia
-                    component="img"
+                <Link href={`/news/${post._id}`}>
+                  <Card
                     sx={{
-                      maxHeight: "%60",
-                      minHeight: "%50",
+                      minWidth: 300,
+                      maxWidth: 600,
+                      minHeight: 200,
+                      maxHeight: 800,
                     }}
-                    image={post.photoURL}
-                    alt={post.location}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="h5">
-                      {post.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {post.news.slice(0, 150)}...
-                    </Typography>
-                    <br />
-                    <div className="flex items-end"></div>
-                    {dateFormat(post.createdAt, "mmmm dS, yyyy")}
-                  </CardContent>
-                  <CardActions>
-                    <Link href={`/news/${post._id}`}>
-                      <Button size="small">Go into details...</Button>
-                    </Link>
-                  </CardActions>
-                </Card>
+                  >
+                    <CardMedia
+                      component="img"
+                      sx={{
+                        maxHeight: "50px",
+                        minHeight: "50px",
+                      }}
+                      image={post.photoURL}
+                      alt={post.location}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="h5">
+                        {post.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {post.news.slice(0, 150)}...
+                      </Typography>
+                      <br />
+                      <div className="flex items-end"></div>
+                      {dateFormat(post.createdAt, "mmmm dS, yyyy")}
+                    </CardContent>
+                    <CardActions>
+                      <Link href={`/news/${post._id}`}>
+                        <Button size="small">Go into details...</Button>
+                      </Link>
+                    </CardActions>
+                  </Card>
+                </Link>
               </Grid>
             );
           })}
