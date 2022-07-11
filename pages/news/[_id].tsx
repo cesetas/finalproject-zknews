@@ -687,8 +687,8 @@ export default function Post({ post }) {
                       sx={{
                         mt: 3,
                         mb: 3,
-                        color: "blue",
-                        backgroundColor: "orange",
+                        color: "white",
+                        backgroundColor: "blue",
                       }}
                     >
                       Fund
@@ -701,10 +701,9 @@ export default function Post({ post }) {
                   variant="contained"
                   onClick={getFunds}
                   sx={{
-                    mt: 3,
                     mb: 3,
-                    color: "blue",
-                    backgroundColor: "orange",
+                    color: "white",
+                    backgroundColor: "blue",
                   }}
                 >
                   Current Funds
@@ -755,15 +754,14 @@ export default function Post({ post }) {
                   ) : (
                     <Button
                       type="submit"
-                      color="inherit"
+                      size="large"
+                      color="error"
                       fullWidth
                       variant="contained"
                       endIcon={<SendIcon />}
                       sx={{
                         mt: 3,
                         mb: 3,
-                        color: "orange",
-                        backgroundColor: "blue",
                       }}
                     >
                       Withdraw Funds
